@@ -8,8 +8,8 @@ from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTyp
 # Настройки
 SERIAL_PORT = 'COM3'
 BAUD_RATE = 9600
-AUTHORIZED_CHAT_ID = -1002672194395
-BOT_TOKEN = '7707947574:AAGL-e451TAaQAXiXGG0Jd33Fd9ABOxJau8'
+AUTHORIZED_CHAT_ID = 
+BOT_TOKEN = ''
 
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
 logging.basicConfig(level=logging.INFO)
