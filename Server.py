@@ -1,3 +1,6 @@
+
+# Decibel Pixel Python Server.
+
 import serial
 import logging
 import re
@@ -5,16 +8,16 @@ import time
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
-# Настройки
 SERIAL_PORT = 'COM3'
 BAUD_RATE = 9600
-AUTHORIZED_CHAT_ID = 
-BOT_TOKEN = ''
+AUTHORIZED_CHAT_IDS = '-ID, -ID' 
+BOT_TOKEN = 'TOKeN'
+
+authorized_ids = [int(id_str.strip()) for id_str in AUTHORIZED_CHAT_IDS.split(',')]
 
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
 logging.basicConfig(level=logging.INFO)
 
-# Таблица шрифта 5x7 (остается без изменений)
 FONT_5x7 = {
     'А': [
         "01110",
@@ -881,13 +884,13 @@ FONT_5x7 = {
         "10001"
     ],
     'й': [
-        "00100",
-        "01010",
-        "10001",
-        "10011",
-        "10101",
-        "11001",
-        "10001"
+"01100",
+"00100",
+"10001",
+"10011",
+"10101",
+"11001",
+"10001"
     ],
     'к': [
         "00000",
@@ -908,13 +911,13 @@ FONT_5x7 = {
         "10001"
     ],
     'м': [
-        "00000",
-        "00000",
-        "10001",
-        "11011",
-        "10101",
-        "10001",
-        "10001"
+"00000",
+"00000",
+"01010",
+"10101",
+"10001",
+"10001",
+"10001"
     ],
     'н': [
         "00000",
@@ -980,13 +983,13 @@ FONT_5x7 = {
         "11110"
     ],
     'ф': [
-        "00100",
-        "01110",
-        "10101",
-        "11111",
-        "10101",
-        "01110",
-        "00100"
+"00000",
+"00000",
+"01010",
+"10101",
+"10101",
+"01110",
+"00100"
     ],
     'х': [
         "00000",
@@ -998,13 +1001,13 @@ FONT_5x7 = {
         "10001"
     ],
     'ц': [
-        "00000",
-        "10001",
-        "10001",
-        "10001",
-        "10001",
-        "10001",
-        "11111"
+"00000",
+"00000",
+"10010",
+"10010",
+"10010",
+"11111",
+"00001"
     ],
     'ч': [
         "00000",
@@ -1025,31 +1028,31 @@ FONT_5x7 = {
         "11111"
     ],
     'щ': [
-        "00000",
-        "10101",
-        "10101",
-        "10101",
-        "10101",
-        "10101",
-        "11111"
+"00000",
+"00000",
+"10101",
+"10101",
+"10101",
+"11111",
+"00001"
     ],
     'ъ': [
-        "11000",
-        "01000",
-        "01000",
-        "01110",
-        "01001",
-        "01001",
-        "01110"
+"00000",
+"00000",
+"11100",
+"00100",
+"00110",
+"00101",
+"00010"
     ],
     'ы': [
-        "00000",
-        "10001",
-        "10001",
-        "11110",
-        "10001",
-        "10001",
-        "11110"
+"00000",
+"00000",
+"10001",
+"10001",
+"11001",
+"10101",
+"01001"
     ],
     'ь': [
         "00000",
@@ -1070,13 +1073,13 @@ FONT_5x7 = {
         "01110"
     ],
     'ю': [
-        "00000",
-        "10110",
-        "11001",
-        "11111",
-        "11001",
-        "11001",
-        "10110"
+"00000",
+"10010",
+"10101",
+"11101",
+"10101",
+"10101",
+"10010"
     ],
     'я': [
         "00000",
@@ -1086,7 +1089,126 @@ FONT_5x7 = {
         "00101",
         "01001",
         "10001"
-    ]
+    ],
+        '1': [
+"00010",
+"00110",
+"01010",
+"00010",
+"00010",
+"00010",
+"00010"
+    ],
+            '2': [
+"01110",
+"10001",
+"00001",
+"01110",
+"10000",
+"10000",
+"11111"
+    ],
+           '3': [
+"01110",
+"10001",
+"00001",
+"00110",
+"00001",
+"10001",
+"01110"
+    ],
+               '4': [
+
+
+"00011",
+"00101",
+"01001",
+"10001",
+"01111",
+"00001",
+"00001"
+    ],
+               '5': [
+"01111",
+"10000",
+"10000",
+"01110",
+"00001",
+"00001",
+"11110"
+    ],
+               '6': [
+"01111",
+"10000",
+"10000",
+"11110",
+"10001",
+"10001",
+"01110"
+    ],
+               '7': [
+"11110",
+"10001",
+"00001",
+"00111",
+"00001",
+"00001",
+"00001"
+    ],
+               '8': [
+"01110",
+"10001",
+"10001",
+"11111",
+"10001",
+"10001",
+"01110"
+    ],
+               '9': [
+"01110",
+"10001",
+"10001",
+"01111",
+"00001",
+"10001",
+"01110"
+    ],
+               '0': [
+"01110",
+"10001",
+"10001",
+"10001",
+"10001",
+"10001",
+"01110"
+    ],
+               '.': [
+"00000",
+"00000",
+"00000",
+"00000",
+"00000",
+"00000",
+"00100"
+    ],
+                   '+': [
+"00000",
+"00100",
+"00100",
+"11111",
+"00100",
+"00100",
+"00000"
+    ],
+                  ':': [
+"00000",
+"00000",
+"00100",
+"00000",
+"00100",
+"00000",
+"00000"
+    ],
 }
 
 def extract_commands(message_text: str):
@@ -1132,21 +1254,21 @@ def text_to_pixel_coords(text, offset):
     x_offset = offset
     for char in text:
         if char not in FONT_5x7:
-            char = ' '  # Заменяем неизвестные символы на пробел
+            char = ' '  
         bitmap = FONT_5x7[char]
         for y in range(7):
             for x in range(5):
                 if bitmap[y][x] == '1':
-                    x_coord = x_offset + x + 1  # +1, т.к. координаты от 1
+                    x_coord = x_offset + x + 1  
                     y_coord = y + 1
                     if 1 <= x_coord <= 32 and 1 <= y_coord <= 8:
                         coords.append(f"{x_coord},{y_coord}")
-        x_offset += 6  # Между символами 1 пиксель
+        x_offset += 6 
     return coords
 
 def generate_scrolling_frames(text, display_width=32):
     """Генерирует все кадры для бегущей строки"""
-    total_width = len(text) * 6  # 5 пикселей на символ + 1 пробел
+    total_width = len(text) * 6
     frames = []
     
     for shift in range(display_width + total_width):
@@ -1156,58 +1278,47 @@ def generate_scrolling_frames(text, display_width=32):
     return frames
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_chat.id != AUTHORIZED_CHAT_ID:
+    if update.effective_chat.id not in authorized_ids:
         await update.message.reply_text("Доступ запрещён.")
         return
 
     text = update.message.text.strip()
 
-    # --- Обработка /print TEXT ---
     if text.lower().startswith("/print"):
         content = text[6:].strip()
         if not content:
-            await update.message.reply_text("Нужно указать текст после /print")
             return
 
-        # Генерируем все кадры анимации
+        if len(content) > 100:
+            return
+
         frames = generate_scrolling_frames(content)
-        
-        # Отправляем все кадры последовательно
+
         for frame in frames:
-            # Очищаем весь экран одной командой
             clear_all_pixels()
-            
-            # Рисуем текущий кадр
             send_commands_in_batches("draw", frame)
-            
-            time.sleep(0.1)  # Задержка между кадрами
+            time.sleep(0.1)
         
         return
 
-    # --- Обработка /draw, /clear, /draw all, /clear all ---
     draw_coords, clear_coords, clear_all, draw_all = extract_commands(text)
 
     responses = []
 
     if clear_all:
         clear_all_pixels()
-        responses.append("Очищена вся матрица.")
     elif draw_all:
         draw_all_pixels()
-        responses.append("Закрашена вся матрица.")
     else:
         if draw_coords:
             send_commands_in_batches("draw", draw_coords)
-            responses.append(f"Нарисовано {len(draw_coords)} пикселей.")
-
         if clear_coords:
             send_commands_in_batches("clear", clear_coords)
-            responses.append(f"Очищено {len(clear_coords)} пикселей.")
 
     if responses:
         await update.message.reply_text('\n'.join(responses))
-    else:
-        await update.message.reply_text("Я не понял команду. Используй /draw x,y или /clear x,y или /draw all /clear all")
+    #else:
+        #await update.message.reply_text("Я не понял командуу. Используй /draw x,y или /clear x,y или /draw all /clear all")
 
 def main():
     app = ApplicationBuilder().token(BOT_TOKEN).build()
